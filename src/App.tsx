@@ -1,25 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// src/App.tsx
+import React, { useState } from 'react';
+import { Container } from '@mui/material';
+import Form from './components/Form';
+import DisplayData from './components/DisplayData';
 
 function App() {
+  const [submittedData, setSubmittedData] = useState(null);
+
+  const handleSubmit = (formData: any) => {
+    // Log the data to the console
+    console.log(formData);
+    setSubmittedData(formData);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container maxWidth="sm">
+      <h1>Simple Form</h1>
+      <Form onSubmit={handleSubmit} />
+      {submittedData && <DisplayData data={submittedData} />}
+    </Container>
   );
 }
 
