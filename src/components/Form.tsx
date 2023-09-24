@@ -1,6 +1,7 @@
 // src/components/Form.tsx
 import React, { useState } from 'react';
 import { TextField, Button, Grid } from '@mui/material';
+import { validateEmail } from '../utils/validation'; // Import the validation function
 
 interface FormData {
   email: string;
@@ -19,37 +20,46 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     school: '',
   });
 
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [formErrors, setFormErrors] = useState<Partial<FormData>>({});
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-  };
-
-  const validateForm = () => {
-    const newErrors: Partial<FormData> = {};
-
-    // Basic email validation
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
-    }
-
-    setErrors(newErrors);
-
-    // Return true if there are no errors
-    return Object.keys(newErrors).length === 0;
+    // Clear validation error when user starts typing
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
   };
 
   const handleSubmit = (): void => {
-    const isValid = validateForm();
+    const newFormErrors: Partial<FormData> = {};
 
-    if (isValid) {
+    // Validate email using the imported function
+    if (!formData.email.trim() || !validateEmail(formData.email)) {
+      newFormErrors.email = 'Please enter a valid email address';
+    }
+
+    // Validate name (add your own validation logic)
+    if (!formData.name.trim()) {
+      newFormErrors.name = 'Name is required';
+    }
+
+    // Validate school (add your own validation logic)
+    if (!formData.school.trim()) {
+      newFormErrors.school = 'School is required';
+    }
+
+    // Check if there are any errors
+    if (Object.keys(newFormErrors).length === 0) {
       onSubmit(formData);
+    } else {
+      setFormErrors(newFormErrors);
     }
   };
 
@@ -63,8 +73,8 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            error={Boolean(errors.email)}
-            helperText={errors.email}
+            error={!!formErrors.email}
+            helperText={formErrors.email}
           />
         </Grid>
         <Grid item xs={12}>
@@ -74,6 +84,8 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
+            error={!!formErrors.name}
+            helperText={formErrors.name}
           />
         </Grid>
         <Grid item xs={12}>
@@ -83,6 +95,8 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
             name="school"
             value={formData.school}
             onChange={handleInputChange}
+            error={!!formErrors.school}
+            helperText={formErrors.school}
           />
         </Grid>
         <Grid item xs={12}>
